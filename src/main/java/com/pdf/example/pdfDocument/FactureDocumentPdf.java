@@ -3,12 +3,14 @@ import com.github.royken.converter.FrenchNumberToWords;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.pdf.example.pdfDocument.models.*;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 
 
 
-public class FactureDocumentPdf {
+public class FactureDocumentPdf extends PdfPageEventHelper{
 
 
 
@@ -19,16 +21,17 @@ public class FactureDocumentPdf {
             //Create new document
             Document document =new Document();
             FileOutputStream fos=new FileOutputStream(new File(path+"Facture"+facture.getIdFacture()+".pdf"));
-            PdfWriter.getInstance(document,fos);
+            PdfWriter writer=PdfWriter.getInstance(document,fos);
             document.open();
             document.addTitle("Facture");
             //les font utiliser
-            Font cellFont=FontFactory.getFont(FontFactory.TIMES_ROMAN,10F,1,BaseColor.BLACK);
+            Font cellFont=FontFactory.getFont(FontFactory.TIMES_ROMAN,15,1,BaseColor.BLACK);
             Font factureFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,15,1);
-            Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,10,1);
+            Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,13,1);
             Font underline= FontFactory.getFont(FontFactory.TIMES_ROMAN,15,4);
-            Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,8.5F);
+            Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,12);
             Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 10F, BaseColor.WHITE);
+
 //Bar orange
             PdfPTable t=new PdfPTable(1);
             t.setWidthPercentage(100);
@@ -46,7 +49,6 @@ public class FactureDocumentPdf {
             PdfPCell cell1=new PdfPCell();
             cell1.setBorder(PdfPCell.NO_BORDER);
             cell1.setHorizontalAlignment(0);
-            cell1.setFixedHeight(80);
             cell1.setBackgroundColor(new BaseColor(243, 243, 243));
             //Logo
             Image logo;
@@ -64,7 +66,7 @@ public class FactureDocumentPdf {
             tab.addCell(cell1);
             //Info vendeur
             cell1.setHorizontalAlignment(0);
-            cell1.setPhrase(new Phrase("\nNom de société: "+seller.getCompanyName()+"\n\nAdresse et contact: "+seller.getAddress()+" /"+seller.getPhone()+"\n\n\nLes détails fiscaux et bancaires: les suivants: \n",cellFont));
+            cell1.setPhrase(new Phrase("\nNom de société: "+seller.getCompanyName()+"\n\nAdresse et contact: "+seller.getAddress()+" /"+seller.getPhone()+"\n\nLes détails fiscaux et bancaires: les suivants: \n",cellFont));
             tab.addCell(cell1);
             document.add(tab);
             PdfPTable tab3=new PdfPTable(1);
@@ -73,6 +75,7 @@ public class FactureDocumentPdf {
             cell3.setBorder(PdfPCell.NO_BORDER);
             cell3.setBackgroundColor(new BaseColor(243, 243, 243));
             cell3.setPhrase(new Phrase("NRC: "+seller.getNRC() +" - NIF: "+seller.getNRC()+" - NIS: "+seller.getNIS()+" - ART: "+seller.getART()+" - Numero de compte bancaire: "+seller.getAccountNumber(),infoFont));
+            cell3.setPaddingBottom(20);
             tab3.addCell(cell3);
             document.add(tab3);
 
@@ -87,12 +90,20 @@ public class FactureDocumentPdf {
 
             cellBayer.setBackgroundColor(BaseColor.WHITE);
             cellBayer.setPhrase(new Phrase("FACTURE",factureFont));
-//            cellBayer.setBorderWidthBottom(0.5F);
+
 
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Doit:                      code client: "+buyer.getIdBuyer(),DoitFont));
-  //          cellBayer.setBorderWidthBottom(0.5F);
-
+            PdfPTable tf=new PdfPTable(2);
+            tf.setWidthPercentage(100);
+            tf.setWidths(new int[]{20,80});
+            PdfPCell cel=new PdfPCell();
+            cel.setBorder(PdfPCell.NO_BORDER);
+            cel.setPhrase(new Phrase("Doit:",DoitFont));
+            tf.addCell(cel);
+            cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
+            cel.setHorizontalAlignment(2);
+            tf.addCell(cel);
+            cellBayer.addElement(tf);
             tabBayer.addCell(cellBayer);
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
             cellBayer.setPhrase(new Phrase("\nN° de facture: "+facture.getNumFacture()+"\n\nDate: "+facture.getDate()+"\n\nDate d'echance (en cas de proforma): "+facture.getDate_echance(),infoFont));
@@ -136,11 +147,13 @@ public class FactureDocumentPdf {
     table.addCell(headerCell);
 
     PdfPCell dataCell = new PdfPCell();
+
     dataCell.setBorderColor(new BaseColor(68, 58, 58));
     dataCell.setHorizontalAlignment(0);
+    dataCell.setPaddingBottom(5);
     dataCell.setBorderWidthTop(0);
     dataCell.setBorderColorTop(BaseColor.WHITE);
-    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 7.5F, BaseColor.BLACK);
+    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14,BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
         dataCell.setHorizontalAlignment(2);
@@ -248,18 +261,27 @@ public class FactureDocumentPdf {
 
 //Le mode paiemnt et le totate ttc en chiffre et visa du fournisseur
             Paragraph par=new Paragraph();
-String lettere=FrenchNumberToWords.convert((long)order.getPriceTTC());
-Chunk ModeandPrice=new Chunk("Le mode de paiement: "+transaction.getPaymentMethod()+"\nArreté la presente facture à la somme de: ***** "+lettere+" DA *****",cellFont);
+Float num=order.getPriceTTC();
+int dinar= (int) Math.floor(num);
+int centime= (int) Math.floor((num-dinar)*100.0f);
 
-par.add(ModeandPrice);
-par.setAlignment(Element.ALIGN_MIDDLE);
-document.add(par);
-Chunk Signefournisseur=new Chunk("\nVisa du fournisseur",underline);
+String lettere=FrenchNumberToWords.convert(dinar)+" dinar et "+ FrenchNumberToWords.convert(centime)+" centime.";
+Chunk mode=new Chunk("Le mode de paiemnt: ",cellFont);
+document.add(mode);
+mode=new Chunk(transaction.getPaymentMethod(),infoFont);
+document.add(mode);
+Chunk price=new Chunk("\nArreté la presente facture à la somme de:",cellFont);
+document.add(price);
+price=new Chunk(lettere,infoFont);
+document.add(price);
+
+Chunk Signefournisseur=new Chunk("\n\nVisa du fournisseur",underline);
 
             document.add(Signefournisseur);
-            document.add(new Paragraph("\n\n\n\n\n\n\n"));
+
 // Information additionnelles
-            PdfPTable tab2=new PdfPTable(2);
+           PdfPTable tab2=new PdfPTable(2);
+            tab2.setTotalWidth(523);
             tab2.setWidthPercentage(100);
             tab2.setWidths(new int[]{50,50});
             PdfPCell cell2=new PdfPCell();
@@ -273,8 +295,12 @@ Chunk Signefournisseur=new Chunk("\nVisa du fournisseur",underline);
 
             cell2.setPhrase(new Phrase("Email: "+seller.getEmail()+"\n\nSite web: "+seller.getWebSite(),headerFont));
             tab2.addCell(cell2);
+            FooterTable even=new FooterTable(tab2);
+            writer.setPageEvent(even);
 
-            document.add(tab2);
+
+
+
 //fermer le document
             document.close();
 

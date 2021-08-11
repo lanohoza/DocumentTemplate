@@ -19,14 +19,14 @@ public class OrderDocumentPdf {
 
     public boolean Orderpdf(Order order, Buyer buyer, Enterprise seller, String path, Transaction transaction) throws FileNotFoundException, DocumentException {
 
-        Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,10,1);
-        Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,8.5F);
+        Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,13,1);
+        Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,12);
         Font underline= FontFactory.getFont(FontFactory.TIMES_ROMAN,15,4);
         try {
             //Create new document
             Document document =new Document();
             FileOutputStream fos=new FileOutputStream(new File(path+"Bon_Commande"+order.getIdOrder()+".pdf"));
-            PdfWriter.getInstance(document,fos);
+            PdfWriter writer=PdfWriter.getInstance(document,fos);
             document.open();
             document.addTitle("Bon commande");
 
@@ -51,14 +51,24 @@ public class OrderDocumentPdf {
 
             cellBayer.setPhrase(new Phrase(""));
             tabBayer.addCell(cellBayer);
-
-            cellBayer.setPhrase(new Phrase("Doit:                      code client: "+buyer.getIdBuyer(),DoitFont));
+PdfPTable t=new PdfPTable(2);
+t.setWidthPercentage(100);
+t.setWidths(new int[]{20,80});
+PdfPCell cel=new PdfPCell();
+cel.setBorder(PdfPCell.NO_BORDER);
+cel.setPhrase(new Phrase("Doit:",DoitFont));
+t.addCell(cel);
+cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
+cel.setHorizontalAlignment(2);
+t.addCell(cel);
+            cellBayer.addElement(t);
             tabBayer.addCell(cellBayer);
+
 
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
             cellBayer.setPhrase(new Phrase("Date: "+order.getDateOrder()+"\n\nMode de paiement: "+transaction.getPaymentMethod(),infoFont));
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Nom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\n/Adresse et contact: "+buyer.getAddress()+" "+buyer.getPhone(),infoFont));
+            cellBayer.setPhrase(new Phrase("Nom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+" / "+buyer.getPhone(),infoFont));
             tabBayer.addCell(cellBayer);
 
             document.add(tabBayer);
@@ -100,9 +110,10 @@ public class OrderDocumentPdf {
     PdfPCell dataCell = new PdfPCell();
     dataCell.setBorderColor(new BaseColor(68, 58, 58));
     dataCell.setHorizontalAlignment(0);
+    dataCell.setPaddingBottom(5);
     dataCell.setBorderWidthTop(0);
     dataCell.setBorderColorTop(BaseColor.WHITE);
-    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 7.5F, BaseColor.BLACK);
+    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
         dataCell.setHorizontalAlignment(2);
@@ -197,11 +208,12 @@ public class OrderDocumentPdf {
             Chunk Signefournisseur=new Chunk("\nVisa du fournisseur",underline);
 
             document.add(Signefournisseur);
-            document.add(new Paragraph("\n\n\n\n\n\n\n"));
+
 // Information additionnelles
             PdfPTable tab2=new PdfPTable(2);
             tab2.setWidthPercentage(100);
             tab2.setWidths(new int[]{50,50});
+            tab2.setTotalWidth(523);
             PdfPCell cell2=new PdfPCell();
             cell2.setBorder(PdfPCell.NO_BORDER);
             cell2.setHorizontalAlignment(0);
@@ -214,8 +226,8 @@ public class OrderDocumentPdf {
             cell2.setPhrase(new Phrase("Email: "+seller.getEmail()+"\n\nSite web: "+seller.getWebSite(),headerFont));
             tab2.addCell(cell2);
 
-
-            document.add(tab2);
+            FooterTable even=new FooterTable(tab2);
+            writer.setPageEvent(even);
 
             document.close();
 

@@ -22,15 +22,15 @@ public class DeliveryDocumentPdf {
             //Create new document
             Document document =new Document();
             FileOutputStream fos=new FileOutputStream(new File(path+"Bon_Livraison"+delivery.getIdDelivery()+".pdf"));
-            PdfWriter.getInstance(document,fos);
+            PdfWriter writer=PdfWriter.getInstance(document,fos);
             document.open();
             document.addTitle("Delivery");
             //les font utiliser
-            Font cellFont=FontFactory.getFont(FontFactory.TIMES_ROMAN,10F,1,BaseColor.BLACK);
+            Font cellFont=FontFactory.getFont(FontFactory.TIMES_ROMAN,15,1,BaseColor.BLACK);
             Font factureFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,15,1);
-            Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,10,1);
+            Font DoitFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,13,1);
             Font underline= FontFactory.getFont(FontFactory.TIMES_ROMAN,15,4);
-            Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,8.5F);
+            Font infoFont= FontFactory.getFont(FontFactory.TIMES_ROMAN,12);
             Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 10F, BaseColor.WHITE);
 //Bar orange
             PdfPTable t=new PdfPTable(1);
@@ -49,7 +49,7 @@ public class DeliveryDocumentPdf {
             PdfPCell cell1=new PdfPCell();
             cell1.setBorder(PdfPCell.NO_BORDER);
             cell1.setHorizontalAlignment(0);
-            cell1.setFixedHeight(80);
+           // cell1.setFixedHeight(80);
             cell1.setBackgroundColor(new BaseColor(243, 243, 243));
 //logo
             Image logo;
@@ -68,7 +68,8 @@ public class DeliveryDocumentPdf {
 
      //Info vendeur
             cell1.setHorizontalAlignment(0);
-            cell1.setPhrase(new Phrase("\nNom de société: "+seller.getCompanyName()+"\n\nAdresse et contact: "+seller.getAddress()+"/ "+seller.getPhone()+"\n\n\nLes détails fiscaux et bancaires: les suivants: \n",cellFont));
+            cell1.setPhrase(new Phrase("\nNom de société: "+seller.getCompanyName()+"\n\nAdresse et contact: "+seller.getAddress()+" /"+seller.getPhone()+"\n\nLes détails fiscaux et bancaires: les suivants: \n",cellFont));
+            tab.addCell(cell1);
             tab.addCell(cell1);
             document.add(tab);
             PdfPTable tab3=new PdfPTable(1);
@@ -77,6 +78,7 @@ public class DeliveryDocumentPdf {
             cell3.setBorder(PdfPCell.NO_BORDER);
             cell3.setBackgroundColor(new BaseColor(243, 243, 243));
             cell3.setPhrase(new Phrase("NRC: "+seller.getNRC() +" - NIF: "+seller.getNRC()+" - NIS: "+seller.getNIS()+" - ART: "+seller.getART()+" - Numero de compte bancaire: "+seller.getAccountNumber(),infoFont));
+            cell3.setPaddingBottom(20);
             tab3.addCell(cell3);
             document.add(tab3);
 
@@ -87,16 +89,22 @@ public class DeliveryDocumentPdf {
             tabBayer.setWidthPercentage(100);
             PdfPCell cellBayer=new PdfPCell();
             cellBayer.setBorder(PdfPCell.NO_BORDER);
-            tabBayer.setWidths(new int[]{60,40});
+            tabBayer.setWidths(new int[]{60,50});
 
             cellBayer.setBackgroundColor(BaseColor.WHITE);
             cellBayer.setPhrase(new Phrase("BON DE LIVRAISON N° BL: "+delivery.getNumDelivery(),factureFont));
-//            cellBayer.setBorderWidthBottom(0.5F);
-
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Doit:              code client: "+buyer.getIdBuyer(),DoitFont));
-  //          cellBayer.setBorderWidthBottom(0.5F);
-
+            PdfPTable td=new PdfPTable(2);
+            td.setWidthPercentage(100);
+            td.setWidths(new int[]{20,80});
+            PdfPCell cel=new PdfPCell();
+            cel.setBorder(PdfPCell.NO_BORDER);
+            cel.setPhrase(new Phrase("Doit:",DoitFont));
+            td.addCell(cel);
+            cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
+            cel.setHorizontalAlignment(2);
+            td.addCell(cel);
+            cellBayer.addElement(td);
             tabBayer.addCell(cellBayer);
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
             cellBayer.setPhrase(new Phrase("\nDate: "+delivery.getDateDelivery()+"\n\nN° de commande: "+order.getOrderNum()+"\n\nMode de paiement: "+transaction.getPaymentMethod(),infoFont));
@@ -141,10 +149,11 @@ public class DeliveryDocumentPdf {
 
     PdfPCell dataCell = new PdfPCell();
     dataCell.setBorderColor(new BaseColor(68, 58, 58));
+    dataCell.setPaddingBottom(5);
     dataCell.setHorizontalAlignment(0);
     dataCell.setBorderWidthTop(0);
     dataCell.setBorderColorTop(BaseColor.WHITE);
-    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 7.5F, BaseColor.BLACK);
+    Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
         dataCell.setHorizontalAlignment(2);
@@ -263,6 +272,7 @@ document.add(Signefournisseur);
             PdfPTable tab2=new PdfPTable(2);
             tab2.setWidthPercentage(100);
             tab2.setWidths(new int[]{50,50});
+            tab2.setTotalWidth(523);
             PdfPCell cell2=new PdfPCell();
             cell2.setBorder(PdfPCell.NO_BORDER);
             cell2.setHorizontalAlignment(0);
@@ -274,8 +284,8 @@ document.add(Signefournisseur);
 
             cell2.setPhrase(new Phrase("Email: "+seller.getEmail()+"\n\nSite web: "+seller.getWebSite(),headerFont));
             tab2.addCell(cell2);
-
-            document.add(tab2);
+            FooterTable even=new FooterTable(tab2);
+            writer.setPageEvent(even);
 //fermer le document
             document.close();
 
