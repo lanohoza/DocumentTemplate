@@ -1,5 +1,6 @@
 package com.pdf.example.pdfDocument;
 
+import com.github.royken.converter.FrenchNumberToWords;
 import com.itextpdf.text.DocumentException;
 
 import com.pdf.example.pdfDocument.models.*;
@@ -16,6 +17,9 @@ import java.io.FileNotFoundException;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestFacture {
@@ -32,13 +36,15 @@ public class TestFacture {
     Transaction transaction;
     @Mock
     Facture facture;
-
+@Mock
+    FrenchNumberToWords frenchNumberToWords;
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
     }
     @Test
-    public void Test_path_exist_FacturePdf(){
+    public void Test_path_exist_FacturePdf()
+    {
         String path_true = "./";
         boolean Doc = factpdf.Facturepdf(order, buyer, seller, transaction, facture, path_true);
         assertEquals(true, Doc);

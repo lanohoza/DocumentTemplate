@@ -177,11 +177,11 @@ public class DeliveryDocumentPdf {
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getPriceUnit())+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (product.getPriceUnit()))+" DA", dataFont));
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(order.getTotalProduct(product))+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (order.getTotalProduct(product)))+" DA", dataFont));
         table.addCell(dataCell);
 }
 
@@ -201,7 +201,7 @@ public class DeliveryDocumentPdf {
              del.setPhrase(new Phrase("TOTAL HR",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(String.valueOf(order.getOrderTotal())+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
             table.addCell(del);
 
             del.setPhrase(new Phrase(""));
@@ -219,7 +219,7 @@ public class DeliveryDocumentPdf {
             del.setPhrase(new Phrase("TVA",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(String.valueOf(order.getPriceTVA())+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.calculTVA()))+" DA",dataFont));
             table.addCell(del);
 
             del.setHorizontalAlignment(0);
@@ -238,7 +238,7 @@ public class DeliveryDocumentPdf {
             del.setPhrase(new Phrase("Remise",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(order.getRemise()+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.getRemise()))+" DA",dataFont));
             table.addCell(del);
 
             del.setHorizontalAlignment(0);
@@ -258,7 +258,7 @@ public class DeliveryDocumentPdf {
             table.addCell(del);
             del.setHorizontalAlignment(2);
             del.setBackgroundColor(new BaseColor(255,87,34));
-            del.setPhrase(new Phrase((order.getPriceTTC())+" DA",dataFont));
+            del.setPhrase(new Phrase((String.format("%.2f", order.calculTTC()))+" DA",dataFont));
             table.addCell(del);
 
             document.add(table);

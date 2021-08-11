@@ -13,23 +13,23 @@ public class Order {
 
     private String idOrder;
     private String orderNum;
-private float orderTotal;
-    private float priceTTC;
-    private float priceTVA;
+private double orderTotal;
+    private double priceTTC;
+    private double priceTVA;
     private List<Product> products;
     private String dateOrder;
-    private float remise;
+    private double remise;
 
 
 
 //fonction calculer total pour un seul produit
-    public  float getTotalProduct(Product product) {
+    public  double getTotalProduct(Product product) {
         float total=0;
             total = product.getPriceUnit() * product.getQuantity();
             return total;
     }
 
-    public float calculTotalHT(){
+    public double calculTotalHT(){
         orderTotal=0;
        for (Product p:products){
            orderTotal=orderTotal+getTotalProduct(p);
@@ -38,17 +38,17 @@ private float orderTotal;
     }
 
 //fonction calculer le prix tva
-    public  float calculTVA() {
-       float pourcentage= (float) 0.19;
+    public  double calculTVA() {
+       double pourcentage=  0.19;
        priceTVA=(orderTotal-remise)*pourcentage;
       return priceTVA;
     }
 
 //fonction calcul prix ttc
 
-    public float calculTTC(){
+    public double calculTTC(){
 
-        priceTTC=((orderTotal-remise)+priceTVA);
+        priceTTC= ((orderTotal-remise)+priceTVA);
         return priceTTC;
     }
 }

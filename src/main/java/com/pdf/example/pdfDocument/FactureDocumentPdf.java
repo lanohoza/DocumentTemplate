@@ -7,7 +7,7 @@ import com.pdf.example.pdfDocument.models.*;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
-
+import java.text.DecimalFormat;
 
 
 public class FactureDocumentPdf extends PdfPageEventHelper{
@@ -173,11 +173,11 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getPriceUnit())+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (product.getPriceUnit()))+" DA", dataFont));
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(order.getTotalProduct(product))+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (order.getTotalProduct(product)))+" DA", dataFont));
         table.addCell(dataCell);
 }
 
@@ -197,7 +197,7 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
              del.setPhrase(new Phrase("TOTAL HR",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(String.valueOf(order.getOrderTotal())+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
             table.addCell(del);
 
             del.setPhrase(new Phrase(""));
@@ -215,7 +215,7 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
             del.setPhrase(new Phrase("TVA",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(String.valueOf(order.getPriceTVA())+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.calculTVA()))+" DA",dataFont));
             table.addCell(del);
 
             del.setHorizontalAlignment(0);
@@ -234,7 +234,7 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
             del.setPhrase(new Phrase("Remise",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(order.getRemise()+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.getRemise()))+" DA",dataFont));
             table.addCell(del);
 
             del.setHorizontalAlignment(0);
@@ -254,27 +254,31 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
             table.addCell(del);
             del.setHorizontalAlignment(2);
             del.setBackgroundColor(new BaseColor(255,87,34));
-            del.setPhrase(new Phrase((order.getPriceTTC())+" DA",dataFont));
+            del.setPhrase(new Phrase((String.format("%.2f", order.calculTTC()))+" DA",dataFont));
             table.addCell(del);
 
             document.add(table);
 
 //Le mode paiemnt et le totate ttc en chiffre et visa du fournisseur
-            Paragraph par=new Paragraph();
-Float num=order.getPriceTTC();
-int dinar= (int) Math.floor(num);
-int centime= (int) Math.floor((num-dinar)*100.0f);
 
-String lettere=FrenchNumberToWords.convert(dinar)+" dinar et "+ FrenchNumberToWords.convert(centime)+" centime.";
-Chunk mode=new Chunk("Le mode de paiemnt: ",cellFont);
-document.add(mode);
-mode=new Chunk(transaction.getPaymentMethod(),infoFont);
-document.add(mode);
-Chunk price=new Chunk("\nArreté la presente facture à la somme de:",cellFont);
-document.add(price);
-price=new Chunk(lettere,infoFont);
-document.add(price);
+if(order.getPriceTTC()!=0) {
 
+System.out.println(order.getPriceTTC());
+    double num =  order.getPriceTTC();
+    System.out.println(num);
+    int dinar = (int) Math.floor(num);
+    int centime = (int) Math.floor((num - dinar) * 100.0f);
+    System.out.println(centime);
+    String lettere = FrenchNumberToWords.convert(dinar) + " dinar et " + FrenchNumberToWords.convert(centime) + " centime.";
+    Chunk mode = new Chunk("Le mode de paiemnt: ", cellFont);
+    document.add(mode);
+    mode = new Chunk(transaction.getPaymentMethod(), infoFont);
+    document.add(mode);
+    Chunk price = new Chunk("\nArreté la presente facture à la somme de:", cellFont);
+    document.add(price);
+    price = new Chunk(lettere, infoFont);
+    document.add(price);
+}
 Chunk Signefournisseur=new Chunk("\n\nVisa du fournisseur",underline);
 
             document.add(Signefournisseur);

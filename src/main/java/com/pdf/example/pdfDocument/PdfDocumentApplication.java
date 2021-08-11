@@ -23,7 +23,7 @@ public class PdfDocumentApplication {
 	}
 
 	public static void main(String[] args) throws DocumentException, FileNotFoundException {
-		SpringApplication.run(PdfDocumentApplication.class, args);
+		//SpringApplication.run(PdfDocumentApplication.class, args);
 		OrderDocumentPdf doc=new OrderDocumentPdf();
 		FactureDocumentPdf fac=new FactureDocumentPdf();
 

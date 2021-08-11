@@ -137,11 +137,11 @@ t.addCell(cel);
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getPriceUnit())+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (product.getPriceUnit()))+" DA", dataFont));
         table.addCell(dataCell);
 
 
-        dataCell.setPhrase(new Phrase(String.valueOf(order.getTotalProduct(product))+" DA", dataFont));
+        dataCell.setPhrase(new Phrase(String.format("%.2f", (order.getTotalProduct(product)))+" DA", dataFont));
         table.addCell(dataCell);
 
 
@@ -163,7 +163,7 @@ t.addCell(cel);
     del.setPhrase(new Phrase("TOTAL HR",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-    del.setPhrase(new Phrase(String.valueOf(order.calculTotalHT())+" DA",dataFont));
+    del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
             table.addCell(del);
 
             del.setPhrase(new Phrase(""));
@@ -180,7 +180,7 @@ t.addCell(cel);
             del.setPhrase(new Phrase("TVA",dataFont));
             table.addCell(del);
             del.setHorizontalAlignment(2);
-            del.setPhrase(new Phrase(String.valueOf(order.calculTVA())+" DA",dataFont));
+            del.setPhrase(new Phrase(String.format("%.2f", (order.calculTVA()))+" DA",dataFont));
             table.addCell(del);
 
 
@@ -200,7 +200,7 @@ t.addCell(cel);
 
             del.setHorizontalAlignment(2);
             del.setBackgroundColor(new BaseColor(0, 176, 240));
-            del.setPhrase(new Phrase(String.valueOf(order.calculTTC())+" DA",dataFont));
+            del.setPhrase(new Phrase((String.format("%.2f", order.calculTTC()))+" DA",dataFont));
             table.addCell(del);
 
             document.add(table);
