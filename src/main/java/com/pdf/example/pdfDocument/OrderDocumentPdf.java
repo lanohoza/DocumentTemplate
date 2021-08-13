@@ -51,33 +51,24 @@ public class OrderDocumentPdf {
 
             cellBayer.setPhrase(new Phrase(""));
             tabBayer.addCell(cellBayer);
-PdfPTable t=new PdfPTable(2);
-t.setWidthPercentage(100);
-t.setWidths(new int[]{20,80});
-PdfPCell cel=new PdfPCell();
-cel.setBorder(PdfPCell.NO_BORDER);
-cel.setPhrase(new Phrase("Doit:",DoitFont));
-t.addCell(cel);
-cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
-cel.setHorizontalAlignment(2);
-t.addCell(cel);
-            cellBayer.addElement(t);
+
+            cellBayer.setPhrase(new Phrase("Information de demandeur:",DoitFont));
             tabBayer.addCell(cellBayer);
 
 
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
             cellBayer.setPhrase(new Phrase("Date: "+order.getDateOrder()+"\n\nMode de paiement: "+transaction.getPaymentMethod(),infoFont));
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Nom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+" / "+buyer.getPhone(),infoFont));
+            cellBayer.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer()+"\n\nNom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+" / "+buyer.getPhone(),infoFont));
             tabBayer.addCell(cellBayer);
 
             document.add(tabBayer);
             document.add(new Paragraph("\n"));
 
 //tab2
-            PdfPTable table=new PdfPTable(7);
+            PdfPTable table=new PdfPTable(6);
             table.setWidthPercentage(100);
-            table.setWidths(new int[]{1,2,4,1,2,3,3});
+            table.setWidths(new int[]{1,6,1,2,3,3});
 
     PdfPCell headerCell = new PdfPCell();
     headerCell.setBorderColor(new BaseColor(0, 176, 240));
@@ -87,9 +78,6 @@ t.addCell(cel);
     headerCell.setHorizontalAlignment(1);
     Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 10F, BaseColor.WHITE);
     headerCell.setPhrase(new Phrase("N", headerFont));
-    table.addCell(headerCell);
-
-    headerCell.setPhrase(new Phrase("REF", headerFont));
     table.addCell(headerCell);
 
     headerCell.setPhrase(new Phrase("DESCRIPTION", headerFont));
@@ -116,19 +104,15 @@ t.addCell(cel);
     Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
-        dataCell.setHorizontalAlignment(2);
+        dataCell.setHorizontalAlignment(1);
         dataCell.setPhrase(new Phrase(String.valueOf(product.getIdProduct()), dataFont));
         table.addCell(dataCell);
 
-
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getREF()), dataFont));
+        dataCell.setHorizontalAlignment(0);
+        dataCell.setPhrase(new Phrase("Ref: '" +product.getREF()+"' "+product.getDescriptionProduct(), dataFont));
         table.addCell(dataCell);
 
-
-        dataCell.setPhrase(new Phrase(product.getDescriptionProduct(), dataFont));
-        table.addCell(dataCell);
-
-
+        dataCell.setHorizontalAlignment(2);
         dataCell.setPhrase(new Phrase(product.getUnityProduct(), dataFont));
         table.addCell(dataCell);
 
@@ -150,8 +134,6 @@ t.addCell(cel);
     PdfPCell del=new PdfPCell();
     del.setBorderWidth(0);
     del.setPhrase(new Phrase(""));
-    table.addCell(del);
-    del.setPhrase(new Phrase(""));
             table.addCell(del);
     del.setPhrase(new Phrase(""));
             table.addCell(del);
@@ -164,9 +146,6 @@ t.addCell(cel);
             table.addCell(del);
             del.setHorizontalAlignment(2);
     del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
-            table.addCell(del);
-
-            del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
@@ -184,8 +163,6 @@ t.addCell(cel);
             table.addCell(del);
 
 
-            del.setPhrase(new Phrase(""));
-            table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));

@@ -2,8 +2,7 @@ package com.pdf.example.pdfDocument.models;
 
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 
 @Data
@@ -24,7 +23,7 @@ private double orderTotal;
 
 //fonction calculer total pour un seul produit
     public  double getTotalProduct(Product product) {
-        float total=0;
+        float total;
             total = product.getPriceUnit() * product.getQuantity();
             return total;
     }

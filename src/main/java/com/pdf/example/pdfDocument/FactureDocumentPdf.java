@@ -4,10 +4,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.pdf.example.pdfDocument.models.*;
 
-import javax.swing.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.DecimalFormat;
+
 
 
 public class FactureDocumentPdf extends PdfPageEventHelper{
@@ -90,33 +90,23 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
 
             cellBayer.setBackgroundColor(BaseColor.WHITE);
             cellBayer.setPhrase(new Phrase("FACTURE",factureFont));
-
-
             tabBayer.addCell(cellBayer);
-            PdfPTable tf=new PdfPTable(2);
-            tf.setWidthPercentage(100);
-            tf.setWidths(new int[]{20,80});
-            PdfPCell cel=new PdfPCell();
-            cel.setBorder(PdfPCell.NO_BORDER);
-            cel.setPhrase(new Phrase("Doit:",DoitFont));
-            tf.addCell(cel);
-            cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
-            cel.setHorizontalAlignment(2);
-            tf.addCell(cel);
-            cellBayer.addElement(tf);
+
+            cellBayer.setPhrase(new Phrase("Doit:",DoitFont));
             tabBayer.addCell(cellBayer);
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
             cellBayer.setPhrase(new Phrase("\nN° de facture: "+facture.getNumFacture()+"\n\nDate: "+facture.getDate()+"\n\nDate d'echance (en cas de proforma): "+facture.getDate_echance(),infoFont));
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Nom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+"/ "+buyer.getPhone()+"\n\nNRC: "+buyer.getNRC()+"\n\nMF:"+buyer.getNIF()+"\n\nART:"+buyer.getART(),infoFont));
+            cellBayer.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer()+"\n\nNom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+"/ "+buyer.getPhone()+"\n\nNRC: "+buyer.getNRC()+"\n\nMF:"+buyer.getNIF()+"\n\nART:"+buyer.getART(),infoFont));
             tabBayer.addCell(cellBayer);
 
             document.add(tabBayer);
             document.add(new Paragraph("\n"));
+
 //table contient la liste des produits
-            PdfPTable table=new PdfPTable(7);
+            PdfPTable table=new PdfPTable(6);
             table.setWidthPercentage(100);
-            table.setWidths(new int[]{1,2,4,1,2,3,3});
+            table.setWidths(new int[]{1,6,1,2,3,3});
 
     PdfPCell headerCell = new PdfPCell();
     headerCell.setBorderColor(new BaseColor(255,87,34));
@@ -126,9 +116,6 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
     headerCell.setHorizontalAlignment(1);
 
     headerCell.setPhrase(new Phrase("N", headerFont));
-    table.addCell(headerCell);
-
-    headerCell.setPhrase(new Phrase("REF", headerFont));
     table.addCell(headerCell);
 
     headerCell.setPhrase(new Phrase("DESCRIPTION", headerFont));
@@ -156,16 +143,15 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
     Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14,BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
-        dataCell.setHorizontalAlignment(2);
+        dataCell.setHorizontalAlignment(1);
         dataCell.setPhrase(new Phrase(String.valueOf(product.getIdProduct()), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getREF()), dataFont));
+        dataCell.setHorizontalAlignment(0);
+        dataCell.setPhrase(new Phrase("Ref: '" +product.getREF()+"' "+product.getDescriptionProduct(), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase(product.getDescriptionProduct(), dataFont));
-        table.addCell(dataCell);
-
+        dataCell.setHorizontalAlignment(2);
         dataCell.setPhrase(new Phrase(product.getUnityProduct(), dataFont));
         table.addCell(dataCell);
 
@@ -184,8 +170,6 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
     PdfPCell del=new PdfPCell();
     del.setBorderWidth(0);
     del.setPhrase(new Phrase(""));
-    table.addCell(del);
-    del.setPhrase(new Phrase(""));
             table.addCell(del);
     del.setPhrase(new Phrase(""));
             table.addCell(del);
@@ -200,8 +184,6 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
             del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
             table.addCell(del);
 
-            del.setPhrase(new Phrase(""));
-            table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));
@@ -227,8 +209,6 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
             table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
-            del.setPhrase(new Phrase(""));
-            table.addCell(del);
             del.setHorizontalAlignment(0);
 //ajouter remise au cellule de table
             del.setPhrase(new Phrase("Remise",dataFont));
@@ -239,8 +219,6 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
 
             del.setHorizontalAlignment(0);
             del.setPhrase(new Phrase("",cellFont));
-            table.addCell(del);
-            del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
@@ -262,13 +240,9 @@ public class FactureDocumentPdf extends PdfPageEventHelper{
 //Le mode paiemnt et le totate ttc en chiffre et visa du fournisseur
 
 if(order.getPriceTTC()!=0) {
-
-System.out.println(order.getPriceTTC());
     double num =  order.getPriceTTC();
-    System.out.println(num);
     int dinar = (int) Math.floor(num);
     int centime = (int) Math.floor((num - dinar) * 100.0f);
-    System.out.println(centime);
     String lettere = FrenchNumberToWords.convert(dinar) + " dinar et " + FrenchNumberToWords.convert(centime) + " centime.";
     Chunk mode = new Chunk("Le mode de paiemnt: ", cellFont);
     document.add(mode);

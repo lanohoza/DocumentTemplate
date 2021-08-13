@@ -1,6 +1,5 @@
 package com.pdf.example.pdfDocument;
 
-import com.github.royken.converter.FrenchNumberToWords;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -49,7 +48,6 @@ public class DeliveryDocumentPdf {
             PdfPCell cell1=new PdfPCell();
             cell1.setBorder(PdfPCell.NO_BORDER);
             cell1.setHorizontalAlignment(0);
-           // cell1.setFixedHeight(80);
             cell1.setBackgroundColor(new BaseColor(243, 243, 243));
 //logo
             Image logo;
@@ -94,30 +92,20 @@ public class DeliveryDocumentPdf {
             cellBayer.setBackgroundColor(BaseColor.WHITE);
             cellBayer.setPhrase(new Phrase("BON DE LIVRAISON N° BL: "+delivery.getNumDelivery(),factureFont));
             tabBayer.addCell(cellBayer);
-            PdfPTable td=new PdfPTable(2);
-            td.setWidthPercentage(100);
-            td.setWidths(new int[]{20,80});
-            PdfPCell cel=new PdfPCell();
-            cel.setBorder(PdfPCell.NO_BORDER);
-            cel.setPhrase(new Phrase("Doit:",DoitFont));
-            td.addCell(cel);
-            cel.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer(),DoitFont));
-            cel.setHorizontalAlignment(2);
-            td.addCell(cel);
-            cellBayer.addElement(td);
+            cellBayer.setPhrase(new Phrase("Doit:",DoitFont));
             tabBayer.addCell(cellBayer);
             cellBayer.setBackgroundColor(new BaseColor(243, 243, 243));
-            cellBayer.setPhrase(new Phrase("\nDate: "+delivery.getDateDelivery()+"\n\nN° de commande: "+order.getOrderNum()+"\n\nMode de paiement: "+transaction.getPaymentMethod(),infoFont));
+            cellBayer.setPhrase(new Phrase("Date: "+delivery.getDateDelivery()+"\n\nN° de commande: "+order.getOrderNum()+"\n\nMode de paiement: "+transaction.getPaymentMethod(),infoFont));
             tabBayer.addCell(cellBayer);
-            cellBayer.setPhrase(new Phrase("Nom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+"/ "+buyer.getPhone(),infoFont));
+            cellBayer.setPhrase(new Phrase("Code client:"+buyer.getIdBuyer()+"\n\nNom de client: "+buyer.getFirstname()+" "+buyer.getLastname()+"\n\nAdresse et contact: "+buyer.getAddress()+"/ "+buyer.getPhone(),infoFont));
             tabBayer.addCell(cellBayer);
 
             document.add(tabBayer);
             document.add(new Paragraph("\n"));
 //table contient la liste des produits
-            PdfPTable table=new PdfPTable(7);
+            PdfPTable table=new PdfPTable(6);
             table.setWidthPercentage(100);
-            table.setWidths(new int[]{1,2,4,1,2,3,3});
+            table.setWidths(new int[]{1,6,1,2,3,3});
 
     PdfPCell headerCell = new PdfPCell();
     headerCell.setBorderColor(new BaseColor(255,87,34));
@@ -127,9 +115,6 @@ public class DeliveryDocumentPdf {
     headerCell.setHorizontalAlignment(1);
 
     headerCell.setPhrase(new Phrase("N", headerFont));
-    table.addCell(headerCell);
-
-    headerCell.setPhrase(new Phrase("REF", headerFont));
     table.addCell(headerCell);
 
     headerCell.setPhrase(new Phrase("DESCRIPTION", headerFont));
@@ -156,19 +141,14 @@ public class DeliveryDocumentPdf {
     Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, BaseColor.BLACK);
 
     for (Product product : order.getProducts()) {
-        dataCell.setHorizontalAlignment(2);
+        dataCell.setHorizontalAlignment(1);
         dataCell.setPhrase(new Phrase(String.valueOf(product.getIdProduct()), dataFont));
         table.addCell(dataCell);
-
-
-        dataCell.setPhrase(new Phrase(String.valueOf(product.getREF()), dataFont));
+        dataCell.setHorizontalAlignment(0);
+        dataCell.setPhrase(new Phrase("Ref: '" +product.getREF()+"' "+product.getDescriptionProduct(), dataFont));
         table.addCell(dataCell);
 
-
-        dataCell.setPhrase(new Phrase(product.getDescriptionProduct(), dataFont));
-        table.addCell(dataCell);
-
-
+        dataCell.setHorizontalAlignment(2);
         dataCell.setPhrase(new Phrase(product.getUnityProduct(), dataFont));
         table.addCell(dataCell);
 
@@ -195,8 +175,6 @@ public class DeliveryDocumentPdf {
             table.addCell(del);
     del.setPhrase(new Phrase(""));
             table.addCell(del);
-    del.setPhrase(new Phrase(""));
-            table.addCell(del);
 //ajouter Le total HR au cellule de table
              del.setPhrase(new Phrase("TOTAL HR",dataFont));
             table.addCell(del);
@@ -204,8 +182,6 @@ public class DeliveryDocumentPdf {
             del.setPhrase(new Phrase(String.format("%.2f", (order.calculTotalHT()))+" DA",dataFont));
             table.addCell(del);
 
-            del.setPhrase(new Phrase(""));
-            table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));
@@ -231,8 +207,6 @@ public class DeliveryDocumentPdf {
             table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
-            del.setPhrase(new Phrase(""));
-            table.addCell(del);
             del.setHorizontalAlignment(0);
 //ajouter remise au cellule de table
             del.setPhrase(new Phrase("Remise",dataFont));
@@ -243,8 +217,6 @@ public class DeliveryDocumentPdf {
 
             del.setHorizontalAlignment(0);
             del.setPhrase(new Phrase("",cellFont));
-            table.addCell(del);
-            del.setPhrase(new Phrase(""));
             table.addCell(del);
             del.setPhrase(new Phrase(""));
             table.addCell(del);
